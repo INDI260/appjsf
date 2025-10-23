@@ -12,6 +12,6 @@ RUN chmod +x mvnw && ./mvnw -B -DskipTests package
 FROM tomcat:9.0-jdk17-temurin AS runtime
 WORKDIR /usr/local/tomcat
 RUN rm -rf webapps/*
-COPY --from=build /workspace/target/appjsf-0.0.1-SNAPSHOT.war webapps/ROOT.war
+COPY --from=build /workspace/target/appjsf-0.0.1-SNAPSHOT.war webapps/
 EXPOSE 8080
-CMD ["catalina.sh","run"]
+CMD ["startup","run"]
