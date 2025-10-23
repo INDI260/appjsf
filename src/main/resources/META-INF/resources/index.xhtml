@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:head>
+    <title>Tienda JSF</title>
+    <style>
+        body {font-family: Arial, sans-serif; margin: 1.5rem; background-color: #f4f4f8; color: #333;}
+        h1, h2 {color: #2c3e50;}
+        .layout {display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;}
+        .card {background: #fff; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);}
+        .actions {display: flex; gap: 0.5rem;}
+        table {width: 100%; border-collapse: collapse; margin-top: 1rem;}
+        th, td {padding: 0.75rem; border-bottom: 1px solid #ddd; text-align: left;}
+        th {background-color: #eceff4;}
+        .summary {margin-top: 1rem; text-align: right; font-weight: bold;}
+        .empty {margin-top: 1rem; color: #888;}
+        .messages {margin-bottom: 1rem;}
+        .form-grid {display: grid; grid-template-columns: 140px 1fr; gap: 0.5rem 1rem;}
+        .form-actions {margin-top: 1rem; display: flex; gap: 0.5rem;}
+        input[type="text"], input[type="number"], textarea {width: 100%; padding: 0.5rem; border: 1px solid #bbb; border-radius: 4px;}
+        textarea {resize: vertical;}
+        .button-primary {background: #1e88e5; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;}
+        .button-secondary {background: #eceff4; color: #2c3e50; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;}
+        .button-danger {background: #d84315; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;}
+        .button-primary:hover, .button-secondary:hover, .button-danger:hover {opacity: 0.9;}
+    </style>
+</h:head>
+<h:body>
+<h1>Carrito de compras</h1>
+<div class="messages">
+    <h:messages id="messages" globalOnly="true" showSummary="true" showDetail="false"/>
+</div>
+<div class="layout">
+    <div class="card">
+        <h2>Gestión del catálogo</h2>
+        <h:form id="productForm">
+            <div class="form-grid">
+                <h:outputLabel for="name" value="Nombre"/>
+                <h:inputText id="name" value="#{storeBean.form.name}" required="true" requiredMessage="El nombre es obligatorio"/>
+
+                <h:outputLabel for="description" value="Descripción"/>
+                <h:inputTextarea id="description" rows="3" value="#{storeBean.form.description}"/>
+
+                <h:outputLabel for="price" value="Precio"/>
+                <h:inputText id="price" value="#{storeBean.form.price}" required="true" requiredMessage="El precio es obligatorio">
+                    <f:convertNumber type="number" maxFractionDigits="2" minFractionDigits="2"/>
+                </h:inputText>
+
+                <h:outputLabel for="stock" value="Stock"/>
+                <h:inputText id="stock" value="#{storeBean.form.stock}" required="true" requiredMessage="El stock es obligatorio">
+                    <f:convertNumber integerOnly="true"/>
+                </h:inputText>
+            </div>
+            <div class="form-actions">
+                <h:commandButton styleClass="button-primary" value="#{storeBean.editing ? 'Actualizar producto' : 'Agregar producto'}" action="#{storeBean.saveProduct}"/>
+                <h:commandButton styleClass="button-secondary" value="Cancelar" action="#{storeBean.cancelEdit}" rendered="#{storeBean.editing}" immediate="true"/>
+            </div>
+        </h:form>
+
+        <h:form id="catalogForm">
+            <h:dataTable id="productTable" value="#{storeBean.products}" var="product">
+                <h:column>
+                    <f:facet name="header">Producto</f:facet>
+                    <strong><h:outputText value="#{product.name}"/></strong>
+                    <div><h:outputText value="#{product.description}"/></div>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Precio</f:facet>
+                    <h:outputText value="#{product.price}">
+                        <f:convertNumber type="currency" currencySymbol="$" locale="es_PE"/>
+                    </h:outputText>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Stock</f:facet>
+                    <h:outputText value="#{product.stock}"/>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Acciones</f:facet>
+                    <div class="actions">
+                        <h:commandButton styleClass="button-primary" value="Añadir" action="#{storeBean.addToCart(product.id)}"/>
+                        <h:commandButton styleClass="button-secondary" value="Editar" action="#{storeBean.startEdit(product)}"/>
+                        <h:commandButton styleClass="button-danger" value="Eliminar" action="#{storeBean.deleteProduct(product.id)}"/>
+                    </div>
+                </h:column>
+            </h:dataTable>
+            <h:panelGroup rendered="#{empty storeBean.products}">
+                <p class="empty">No hay productos registrados.</p>
+            </h:panelGroup>
+        </h:form>
+    </div>
+
+    <div class="card">
+        <h2>Carrito de compras</h2>
+        <h:form id="cartForm">
+            <h:dataTable value="#{storeBean.cartItems}" var="item" rendered="#{not empty storeBean.cartItems}">
+                <h:column>
+                    <f:facet name="header">Producto</f:facet>
+                    <strong><h:outputText value="#{item.product.name}"/></strong>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Precio</f:facet>
+                    <h:outputText value="#{item.product.price}">
+                        <f:convertNumber type="currency" currencySymbol="$" locale="es_PE"/>
+                    </h:outputText>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Cantidad</f:facet>
+                    <h:inputText value="#{item.quantity}" size="3">
+                        <f:convertNumber integerOnly="true"/>
+                    </h:inputText>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Subtotal</f:facet>
+                    <h:outputText value="#{item.subtotal}">
+                        <f:convertNumber type="currency" currencySymbol="$" locale="es_PE"/>
+                    </h:outputText>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Acciones</f:facet>
+                    <div class="actions">
+                        <h:commandButton styleClass="button-secondary" value="Actualizar" action="#{storeBean.updateQuantity(item.product.id)}"/>
+                        <h:commandButton styleClass="button-danger" value="Quitar" action="#{storeBean.removeFromCart(item.product.id)}"/>
+                    </div>
+                </h:column>
+            </h:dataTable>
+            <h:panelGroup rendered="#{empty storeBean.cartItems}">
+                <p class="empty">Tu carrito aún está vacío.</p>
+            </h:panelGroup>
+            <h:panelGroup rendered="#{not empty storeBean.cartItems}">
+                <div class="summary">
+                    Total: 
+                    <h:outputText value="#{storeBean.cartTotal}">
+                        <f:convertNumber type="currency" currencySymbol="$" locale="es_PE"/>
+                    </h:outputText>
+                </div>
+                <div class="form-actions" style="justify-content: flex-end;">
+                    <h:commandButton styleClass="button-danger" value="Vaciar carrito" action="#{storeBean.clearCart}"/>
+                </div>
+            </h:panelGroup>
+        </h:form>
+    </div>
+</div>
+</h:body>
+</html>

@@ -1,0 +1,7 @@
+target/
+.vscode/
+.git/
+.gitignore
+HELP.md
+compose.yaml
+Dockerfile

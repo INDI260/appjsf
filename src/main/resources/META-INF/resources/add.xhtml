@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:head>
+    <title>Añadir producto</title>
+    <style>
+        body {font-family: Arial, sans-serif; background:#f5f6fa; color:#2c3e50; margin:0; padding:0;}
+        .container {max-width: 480px; margin: 4rem auto; background:#fff; padding:2rem; border-radius:12px; box-shadow:0 6px 16px rgba(44,62,80,0.15);} 
+        h1 {margin-top:0; font-size:1.8rem;}
+        .form-grid {display:grid; grid-template-columns:120px 1fr; gap:1rem 1.25rem; align-items:center;}
+        .actions {margin-top:2rem; display:flex; gap:1rem; justify-content:flex-end;}
+        input[type="text"], input[type="number"] {width:100%; padding:0.6rem 0.75rem; border:1px solid #cad2e2; border-radius:6px; font-size:1rem;}
+        .button {padding:0.6rem 1.4rem; border:none; border-radius:6px; font-size:1rem; cursor:pointer; transition:background 0.2s ease;}
+        .button-primary {background:#1e88e5; color:#fff;}
+        .button-primary:hover {background:#1565c0;}
+        .button-secondary {background:#eceff4; color:#2c3e50; text-decoration:none; display:inline-flex; align-items:center;}
+        .messages {margin-bottom:1.5rem;}
+    </style>
+</h:head>
+<h:body>
+<div class="container">
+    <h1>Añadir al carrito</h1>
+    <div class="messages">
+        <h:messages id="messages" globalOnly="true" showSummary="true" showDetail="false"/>
+    </div>
+    <h:form id="addForm">
+        <div class="form-grid">
+            <h:outputLabel for="productId" value="Id"/>
+            <h:inputText id="productId" value="#{storeBean.form.id}" required="true" requiredMessage="El identificador es obligatorio">
+                <f:convertNumber integerOnly="true"/>
+            </h:inputText>
+
+            <h:outputLabel for="productName" value="Nombre"/>
+            <h:inputText id="productName" value="#{storeBean.form.name}" required="true" requiredMessage="El nombre es obligatorio"/>
+        </div>
+        <div class="actions">
+            <h:commandButton styleClass="button button-primary" value="Añadir" action="#{storeBean.addProductToCart}"/>
+            <h:outputLink styleClass="button button-secondary" value="/index.html">Salir</h:outputLink>
+        </div>
+    </h:form>
+</div>
+</h:body>
+</html>
