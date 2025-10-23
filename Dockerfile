@@ -7,10 +7,11 @@ COPY .mvn/ .mvn/
 COPY mvnw mvnw
 COPY mvnw.cmd mvnw.cmd
 COPY src/ src/
-RUN ./mvnw -B -DskipTests package
+RUN chmod +x mvnw && ./mvnw -B -DskipTests package
 
-FROM eclipse-temurin:17-jre-alpine AS runtime
-WORKDIR /app
-COPY --from=build /workspace/target/appjsf-0.0.1-SNAPSHOT.jar app.jar
+FROM tomcat:9.0-jdk17-temurin AS runtime
+WORKDIR /usr/local/tomcat
+RUN rm -rf webapps/*
+COPY --from=build /workspace/target/appjsf-0.0.1-SNAPSHOT.war webapps/ROOT.war
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","app.jar"]
+CMD ["catalina.sh","run"]
